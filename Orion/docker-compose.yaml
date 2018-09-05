@@ -1,0 +1,13 @@
+version: "3"
+
+networks:
+    db:
+
+services:
+    orion:
+        image: fiware/orion:1.7.0
+        links:
+          - mongo
+        ports:
+          - "1026:1026"
+        command: -dbhost mongo.fiware-certification.svc

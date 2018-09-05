@@ -1,0 +1,4 @@
+kompose --provider openshift --file docker-compose.yaml convert -o ./config-orion.yaml
+
+
+Config-orion.yaml has been edited to set the cpu and memory limits. If this is not edited, then, it won't start.
