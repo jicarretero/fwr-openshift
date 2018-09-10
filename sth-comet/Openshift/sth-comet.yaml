@@ -1,0 +1,114 @@
+apiVersion: v1
+items:
+- apiVersion: v1
+  kind: ImageStream
+  metadata:
+    annotations:
+      openshift.io/generated-by: OpenShiftNewApp
+    creationTimestamp: null
+    labels:
+      app: sth-comet
+    name: sth-comet
+  spec:
+    lookupPolicy:
+      local: false
+    tags:
+    - annotations:
+        openshift.io/imported-from: jicarretero/sth-comet-ff-jicg:2.3.0
+      from:
+        kind: DockerImage
+        name: jicarretero/sth-comet-ff-jicg:2.3.0
+      generation: null
+      importPolicy: {}
+      name: 2.3.0
+      referencePolicy:
+        type: ""
+  status:
+    dockerImageRepository: ""
+- apiVersion: v1
+  kind: DeploymentConfig
+  metadata:
+    annotations:
+      openshift.io/generated-by: OpenShiftNewApp
+    creationTimestamp: null
+    labels:
+      app: sth-comet
+    name: sth-comet
+  spec:
+    replicas: 1
+    selector:
+      app: sth-comet
+      deploymentconfig: sth-comet
+    strategy:
+      resources:
+        limits:
+          cpu: '1'
+          memory: 512Mi
+        requests:
+          cpu: 50m
+          memory: 128Mi
+    template:
+      metadata:
+        annotations:
+          openshift.io/generated-by: OpenShiftNewApp
+        creationTimestamp: null
+        labels:
+          app: sth-comet
+          deploymentconfig: sth-comet
+      spec:
+        containers:
+        - env:
+          - name: MONGO_URI
+            value: mongo.fiware-certification.svc
+          image: jicarretero/sth-comet-ff-jicg:2.3.0
+          name: sth-comet
+          ports:
+          - containerPort: 8666
+            protocol: TCP
+          resources: 
+            limits:
+              cpu: '1'
+              memory: 512Mi
+            requests:
+              cpu: 50m
+              memory: 128Mi
+    test: false
+    triggers:
+    - type: ConfigChange
+    - imageChangeParams:
+        automatic: true
+        containerNames:
+        - sth-comet
+        from:
+          kind: ImageStreamTag
+          name: sth-comet:2.3.0
+      type: ImageChange
+  status:
+    availableReplicas: 0
+    latestVersion: 0
+    observedGeneration: 0
+    replicas: 0
+    unavailableReplicas: 0
+    updatedReplicas: 0
+- apiVersion: v1
+  kind: Service
+  metadata:
+    annotations:
+      openshift.io/generated-by: OpenShiftNewApp
+    creationTimestamp: null
+    labels:
+      app: sth-comet
+    name: sth-comet
+  spec:
+    ports:
+    - name: 8666-tcp
+      port: 8666
+      protocol: TCP
+      targetPort: 8666
+    selector:
+      app: sth-comet
+      deploymentconfig: sth-comet
+  status:
+    loadBalancer: {}
+kind: List
+metadata: {}

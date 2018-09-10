@@ -1,0 +1,3 @@
+oc new-app -e MONGO_URI=mongo.fiware.svc jicarretero/sth-comet-ff-jicg:2.3.0 --name sth-comet
+
+oc expose service sth-comet --name=sth-comet --port=8666

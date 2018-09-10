@@ -1,0 +1,124 @@
+apiVersion: v1
+items:
+- apiVersion: v1
+  kind: ImageStream
+  metadata:
+    annotations:
+      openshift.io/generated-by: OpenShiftNewApp
+    creationTimestamp: null
+    labels:
+      app: cygnus
+    name: cygnus
+  spec:
+    lookupPolicy:
+      local: false
+    tags:
+    - annotations:
+        openshift.io/imported-from: jicarretero/cygnus-ngsi-ff-jicg:1.8.0
+      from:
+        kind: DockerImage
+        name: jicarretero/cygnus-ngsi-ff-jicg:1.8.0
+      generation: null
+      importPolicy: {}
+      name: 1.8.0
+      referencePolicy:
+        type: ""
+  status:
+    dockerImageRepository: ""
+- apiVersion: v1
+  kind: DeploymentConfig
+  metadata:
+    annotations:
+      openshift.io/generated-by: OpenShiftNewApp
+    creationTimestamp: null
+    labels:
+      app: cygnus
+    name: cygnus
+  spec:
+    replicas: 1
+    selector:
+      app: cygnus
+      deploymentconfig: cygnus
+    strategy:
+      resources:
+        limits:
+          cpu: '1'
+          memory: 2048Mi
+        requests:
+          cpu: 50m
+          memory: 1024Mi
+    template:
+      metadata:
+        annotations:
+          openshift.io/generated-by: OpenShiftNewApp
+        creationTimestamp: null
+        labels:
+          app: cygnus
+          deploymentconfig: cygnus
+      spec:
+        containers:
+        - env:
+          - name: CYGNUS_MONGO_HOSTS
+            value: mongo.fiware-certification.svc
+          - name: CYGNUS_MONGO_USER
+            value: 
+          - name: CYGNUS_MONGO_PASS
+            value: 
+          image: jicarretero/cygnus-ngsi-ff-jicg:1.8.0
+          name: cygnus
+          ports:
+          - containerPort: 5050
+            protocol: TCP
+          - containerPort: 8081
+            protocol: TCP
+          resources:
+            limits:
+              cpu: '1'
+              memory: 2048Mi
+            requests:
+              cpu: 50m
+              memory: 1024Mi
+    test: false
+    triggers:
+    - type: ConfigChange
+    - imageChangeParams:
+        automatic: true
+        containerNames:
+        - cygnus
+        from:
+          kind: ImageStreamTag
+          name: cygnus:1.8.0
+      type: ImageChange
+  status:
+    availableReplicas: 0
+    latestVersion: 0
+    observedGeneration: 0
+    replicas: 0
+    unavailableReplicas: 0
+    updatedReplicas: 0
+- apiVersion: v1
+  kind: Service
+  metadata:
+    annotations:
+      openshift.io/generated-by: OpenShiftNewApp
+    creationTimestamp: null
+    labels:
+      app: cygnus
+    name: cygnus
+  spec:
+    ports:
+    - name: 5050-tcp
+      port: 5050
+      protocol: TCP
+      targetPort: 5050
+    - name: 8081-tcp
+      port: 8081
+      protocol: TCP
+      targetPort: 8081
+    selector:
+      app: cygnus
+      deploymentconfig: cygnus
+  status:
+    loadBalancer: {}
+kind: List
+metadata: {}

@@ -1,0 +1,5 @@
+CONFIGMAP para MySQL
+oc create configmap cygnus-agent-config-mysql --from-file=conf.mysql/
+
+CONFIGMAP para MongoDB
+oc create configmap cygnus-agent-config-mysql --from-file=conf/
