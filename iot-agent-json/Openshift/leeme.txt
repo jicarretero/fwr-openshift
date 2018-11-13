@@ -1,0 +1,6 @@
+oc new-app -e MONGO_HOST=mongo -e ORION_HOST=orion -e MQTT_HOST=mosquitto jicarretero/iotagent-json-no-mosca-ff-remake-jicg:1.8.0 --name iotagent-json -o yaml > iotagent-json.yaml
+
+oc expose service iotagent-json --name=iotagent-json-4041 --port 4041
+
+oc delete all -l app=iotagent-json
+
