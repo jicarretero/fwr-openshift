@@ -84,7 +84,6 @@ Orion Context Broker
 We should edit the orion.yaml file in order to add the parameter "-dbhost mongo" to the entrypoint as Orion_ starts, so Orion can connect to the database.
 
 .. code:: yaml
-   :emphasize-lines: 4-9
 
  .....
    kind: DeploymentConfig
@@ -102,9 +101,54 @@ We should edit the orion.yaml file in order to add the parameter "-dbhost mongo"
  .....
 
 Once changed the file, we can deploy Orion_ Context Broker this way:
+
  .. code:: bash
 
   oc create -f orion.yaml
+
+IoT-Agents
+==========
+
+There are several IoT Agents. The most important ones are iotagent-json and iotagent-ul
+
+IoT-Agent JSON
+--------------
+
+This agent recives the information in JSON format. It can use several transport layers like HTTP, MQTT, AMQP, etc. As usual, we needed to create a Dockerfile and make a few changes in *config.js*. 
+
+A way to deploy it has been:
+
+.. code:: bash
+
+  oc new-app -e MONGO_HOST=mongo \
+  -e ORION_HOST=orion \
+  -e MQTT_HOST=mosquitto \
+  jicarretero/iotagent-json-no-mosca-ff-remake-jicg:1.8.0 --name iotagent-json -o yaml > iotagent-json.yaml
+  
+Once the yaml file has been generated, we can create the application under Openstack:
+
+.. code:: bash
+
+  oc create -f iotagent-json.yaml
+
+
+IoT-Agent UL
+--------------
+This agent is installed in a quite similar way to the previous one. There are 2 possible tags for the docker image of the agent: 1.4.0 and 1.5.0.
+
+.. code:: bash
+
+  oc new-app -e MONGO_HOST=mongo \
+  -e ORION_HOST=orion \
+  -e MQTT_HOST=mosquitto \
+  jicarretero/jicarretero/iotagent-ul-mosca-ff-jicg:1.5.0 --name iotagent-ul -o yaml > iotagent-ul.yaml 
+  
+Once the yaml file has been generated, we can create the application under Openshift:
+
+.. code:: bash
+
+  oc create -f iotagent-ul.yaml
+
 
 Cygnus
 ======
@@ -219,6 +263,34 @@ sth-comet_ is the Short historic document for FIWARE.
 
 We can expose the service if needed:
   oc expose service sth-comet --name=sth-comet --port=8666
+
+
+Cepheus
+=======
+Cepheus consists of 2 processes: cepheus-broker and cepheus-cep. It is not a good Idea to run them using supervisord in the same container under Openshift. So, the way to make things run was a small rebuild of the Docker image using another entrypoint, one simple script named **ep.sh**.
+
+.. code:: bash
+
+ #!/bin/sh
+ 
+ echo "Starting with KIND=${KIND}"
+ 
+ if [ "x$KIND" = "xbroker" ]; then
+     echo BROKER....
+     java -jar cepheus-broker.jar -Dserver.port=8081
+ elif [ "x$KIND" = "xcep" ]; then
+     echo CEP....
+     java -jar cepheus-cep.jar -Dserver.port=8080
+ else
+     echo "Try using KIND=cep|broker"
+ fi
+ 
+So, we need to run 2 instances of this docker, on with each possible kind of behaviour. This new docker image has been run to jicarretero/cepheus-ff-jicg:1.0.0
+ 
+ .. code:: bash
+ 
+  oc new-app jicarretero/cepheus-ff-jicg:1.0.0 -e KIND=cep --name cepheus-cep
+  oc new-app jicarretero/cepheus-ff-jicg:1.0.0 -e KIND=broker --name cepheus-broker
 
 
 .. _FIWARE: http://www.fiware.org/

@@ -1,0 +1,9 @@
+Se debe crear el docker usando la variable KIND --- Esta variable puede tener uno de estos 2 valores:
+   KIND=cep|broker
+
+Construir el docker:
+   docker build -t jicarretero/cepheus-ff-jicg:1.0.0 $PWD
+
+Y subir la imágen:
+   docker push jicarretero/cepheus-ff-jicg:1.0.0
+

@@ -1,0 +1,15 @@
+
+const MONGO_HOST = process.env.MONGO_HOST || 'localhost';
+const ORION_HOST = process.env.ORION_HOST || 'localhost';
+const MQTT_HOST = process.env.MQTT_HOST || 'localhost';
+
+oc new-app -e MONGO_HOST=mongo \
+  -e ORION_HOST=orion \
+  -e MQTT_HOST=mosquitto \
+  jicarretero/jicarretero/iotagent-ul-mosca-ff-jicg:1.5.0 --name iotagent-ul -o yaml > iotagent-ul.yaml 
+
+oc create -f iotagent-ul.yaml
+
+oc expose service iotagent-ul --name=iotagent-ul-4041 --port=4041
+oc expose service iotagent-ul --name=iotagent-ul-7896 --port=7896
+
